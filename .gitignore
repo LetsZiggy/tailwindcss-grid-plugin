@@ -1,0 +1,22 @@
+# ------------------------------ #
+#            General             #
+# ------------------------------ #
+
+# OS
+.DS_STORE
+Thumbs.db
+*.sh
+*.bat
+
+# Editors
+.history
+.idea
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.sublime-workspace
+
+# Dependencies
+node_modules
