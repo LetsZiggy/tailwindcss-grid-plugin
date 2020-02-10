@@ -19,40 +19,33 @@
  *   Used to generate "grid-template-rows", and "grid-auto-rows"
  *   Used to generate "grid-row-start", and "grid-row-end"
  *   "grid-auto-rows" formula: `calc(100% / ${ gridRows.value })`
- *   Largest "grid-row-start" will be generated using the largest `${ gridRows.value * multiplierRows }`
- *   Largest "grid-row-end" will be generated using the largest `${ gridRows.value * multplierRows + 1 }`
+ *   Largest "grid-row-start" will be generated using the largest `${ gridRows.value * rowMultiples }`
+ *   Largest "grid-row-end" will be generated using the largest `${ gridRows.value * rowMultiples } + 1`
  *
- * @param {?(boolean|number|number[])} [options.gridColumns=false] -
- *   `false` will disable `gridColumns`
+ * @param {?(boolean|number|number[])} [options.gridCols=false] -
+ *   `false` will disable `gridCols`
  *   `integers` will be converted to array of same length
- *   `true` or `!Array.isArray(gridColumns)` will default to [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 ]
+ *   `true` or `!Array.isArray(gridCols)` will default to [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 ]
  *   Used to generate "grid-template-columns", and "grid-auto-columns"
  *   Used to generate "grid-column-start", and "grid-column-end"
- *   "grid-auto-columns" formula: `calc(100% / ${ gridColumns.value })`
- *   Largest "grid-column-start" will be generated using the largest `${ gridColumns.value * multiplierColumns }`
- *   Largest "grid-column-end" will be generated using the largest `${ gridColumns.value * multplierColumns + 1 }`
+ *   "grid-auto-columns" formula: `calc(100% / ${ gridCols.value })`
+ *   Largest "grid-column-start" will be generated using the largest `${ gridCols.value * colMultiples }`
+ *   Largest "grid-column-end" will be generated using the largest `${ gridCols.value * colMultiples } + 1`
  *
- * @param {?(boolean|number)} [options.multplierRows=false] -
- *   If `gridRows` is set, `multplierRows` defaults to 1 if non-integer entry provided
+ * @param {?(boolean|number)} [options.rowMultiples=false] -
+ *   If `gridRows` is set, `rowMultiples` defaults to 1 if non-integer entry provided
  *   Multiplier to determine largest "grid-row-start", and "grid-row-end"
  *
- * @param {?(boolean|number)} [options.multplierColumns=false] -
- *   If `gridColumns` is set, `multplierColumns` defaults to 1 if non-integer entry provided
+ * @param {?(boolean|number)} [options.colMultiples=false] -
+ *   If `gridCols` is set, `colMultiples` defaults to 1 if non-integer entry provided
  *   Multiplier to determine largest "grid-column-start", and "grid-column-end"
  *
- * @param {?(boolean|number|number[])} [options.gapRows=false] -
- *   `false` will disable `gapRows`
+ * @param {?(boolean|number|number[])} [options.gaps=false] -
+ *   `false` will disable `gaps`
  *   Integers will be converted to array of same length
  *   `true` or `!Array.isArray(gaps)` will default to [ 1, 2, 3, 4, 5, 6, 7, 8 ]
- *   Used to generate "row-gap"
- *   Values provided will be used to generate gaps in "px" unit
- *   Values with "rem" units will also be generated based on theme("spacing")
- *
- * @param {?(boolean|number|number[])} [options.gapColumns=false] -
- *   `false` will disable `gapColumns`
- *   Integers will be converted to array of same length
- *   `true` or `!Array.isArray(gaps)` will default to [ 1, 2, 3, 4, 5, 6, 7, 8 ]
- *   Used to generate "column-gap"
+ *   Used to generate "gap"
+ *   Used to generate "row-gap", and "column-gap"
  *   Values provided will be used to generate gaps in "px" unit
  *   Values with "rem" units will also be generated based on theme("spacing")
  *
@@ -60,7 +53,7 @@
  *
  * @return {Object} Returns Tailwindcss plugin
  */
-module.exports = function ({ gridRows = false, gridColumns = false, multplierRows = false, multplierColumns = false, gapRows = false, gapColumns = false } = {}) {
+module.exports = function ({ gridRows = false, gridCols = false, rowMultiples = false, colMultiples = false, gaps = false } = {}) {
   // Handle gridRows
   if (gridRows !== false) {
     // Sets gridRows as array from integer
@@ -89,23 +82,23 @@ module.exports = function ({ gridRows = false, gridColumns = false, multplierRow
     }
   }
 
-  // Handle gridColumns
-  if (gridColumns !== false) {
-    // Sets gridColumns as array from integer
-    if (Number.isInteger(gridColumns)) {
-      gridColumns = Array.from({
-        length: gridColumns,
+  // Handle gridCols
+  if (gridCols !== false) {
+    // Sets gridCols as array from integer
+    if (Number.isInteger(gridCols)) {
+      gridCols = Array.from({
+        length: gridCols,
       }, (_, i) => i + 1)
     }
-    // Ensure gridColumns is an array
-    else if (!Array.isArray(gridColumns) || gridColumns.length === 0) {
-      gridColumns = Array.from({
+    // Ensure gridCols is an array
+    else if (!Array.isArray(gridCols) || gridCols.length === 0) {
+      gridCols = Array.from({
         length: 12,
       }, (_, i) => i + 1)
     }
     // Ensure array elements are integers
-    else if (Array.isArray(gridColumns) && gridColumns.length > 0) {
-      gridColumns = gridColumns.reduce((acc, value) => {
+    else if (Array.isArray(gridCols) && gridCols.length > 0) {
+      gridCols = gridCols.reduce((acc, value) => {
         if (Number.isInteger(value)) {
           acc.push(value)
         }
@@ -113,43 +106,42 @@ module.exports = function ({ gridRows = false, gridColumns = false, multplierRow
         return acc
       }, [])
 
-      gridColumns.sort((a, b) => a - b)
+      gridCols.sort((a, b) => a - b)
     }
   }
 
-  // Handle multplierRows
+  // Handle rowMultiples
   if (Array.isArray(gridRows)) {
-    // Ensure multplierRows is an integer
-    if (multplierRows === false || !Number.isInteger(multplierRows)) {
-      multplierRows = 1
+    if (rowMultiples === false || !Number.isInteger(rowMultiples)) {
+      rowMultiples = 1
     }
   }
 
-  // Handle multplierColumns
-  if (Array.isArray(gridColumns)) {
-    // Ensure multplierColumns is an integer
-    if (multplierColumns === false || !Number.isInteger(multplierColumns)) {
-      multplierColumns = 1
+  // Handle colMultiples
+  if (Array.isArray(gridCols)) {
+    // Ensure colMultiples is an integer
+    if (colMultiples === false || !Number.isInteger(colMultiples)) {
+      colMultiples = 1
     }
   }
 
-  // Handle gapRows
-  if (gapRows !== false) {
-    // Sets gapRows as array from integer
-    if (Number.isInteger(gapRows)) {
-      gapRows = Array.from({
-        length: gapRows,
+  // Handle gaps
+  if (gaps !== false) {
+    // Sets gaps as array from integer
+    if (Number.isInteger(gaps)) {
+      gaps = Array.from({
+        length: gaps,
       }, (_, i) => i + 1)
     }
-    // Ensure gapRows is an array
-    else if (!Array.isArray(gapRows) || gapRows.length === 0) {
-      gapRows = Array.from({
+    // Ensure gaps is an array
+    else if (!Array.isArray(gaps) || gaps.length === 0) {
+      gaps = Array.from({
         length: 8,
       }, (_, i) => i + 1)
     }
     // Ensure array elements are integers
-    else if (Array.isArray(gapRows) && gapRows.length > 0) {
-      gapRows = gapRows.reduce((acc, value) => {
+    else if (Array.isArray(gaps) && gaps.length > 0) {
+      gaps = gaps.reduce((acc, value) => {
         if (Number.isInteger(value)) {
           acc.push(value)
         }
@@ -157,35 +149,7 @@ module.exports = function ({ gridRows = false, gridColumns = false, multplierRow
         return acc
       }, [])
 
-      gapRows.sort((a, b) => a - b)
-    }
-  }
-
-  // Handle gapColumns
-  if (gapColumns !== false) {
-    // Sets gapColumns as array from integer
-    if (Number.isInteger(gapColumns)) {
-      gapColumns = Array.from({
-        length: gapColumns,
-      }, (_, i) => i + 1)
-    }
-    // Ensure gapColumns is an array
-    else if (!Array.isArray(gapColumns) || gapColumns.length === 0) {
-      gapColumns = Array.from({
-        length: 8,
-      }, (_, i) => i + 1)
-    }
-    // Ensure array elements are integers
-    else if (gapColumns.length > 1) {
-      gapColumns = gapColumns.reduce((acc, value) => {
-        if (Number.isInteger(value)) {
-          acc.push(value)
-        }
-
-        return acc
-      }, [])
-
-      gapColumns.sort((a, b) => a - b)
+      gaps.sort((a, b) => a - b)
     }
   }
 
@@ -202,105 +166,99 @@ module.exports = function ({ gridRows = false, gridColumns = false, multplierRow
 
     // auto-flow-*
     const autoFlow = {
-      ".auto-flow-row": {
+      ".grid-flow-row": {
         "grid-auto-flow": "row",
       },
-      ".auto-flow-row-dense": {
+      ".grid-flow-row-dense": {
         "grid-auto-flow": "row dense",
       },
-      ".auto-flow-column": {
+      ".grid-flow-col": {
         "grid-auto-flow": "column",
       },
-      ".auto-flow-column-dense": {
+      ".grid-flow-col-dense": {
         "grid-auto-flow": "column dense",
       },
-      ".auto-flow-dense": {
+      ".grid-flow-dense": {
         "grid-auto-flow": "dense",
       },
     }
 
     // grid-template-*
-    const templateRowsColumns = (() => {
-      const templateRows = {}
-      const templateColumns = {}
+    const templateRowsCols = (() => {
+      const templateRows = (gridRows !== false)
+        ? {
+          ".grid-rows-none": {
+            "grid-template-rows": "none",
+          },
+        }
+        : {}
 
       // grid-template-rows
       if (gridRows !== false) {
         for (const value of gridRows) {
-          if (value === 1) {
-            templateRows[`.template-rows-full`] = {
-              "grid-template-rows": "100%",
-            }
-          }
-          else {
-            templateRows[`.${ e(`template-rows-1/${ value }`) }`] = {
-              "grid-template-rows": `[start] repeat(${ value }, 1fr) [end]`,
-            }
+          templateRows[`.${ e(`grid-rows-${ value }`) }`] = {
+            "grid-template-rows": `[start] repeat(${ value }, minmax(0, 1fr)) [end]`,
           }
         }
       }
+
+      const templateCols = (gridCols !== false)
+        ? {
+          ".grid-cols-none": {
+            "grid-template-columns": "none",
+          },
+        }
+        : {}
 
       // grid-template-columns
-      if (gridColumns !== false) {
-        for (const value of gridColumns) {
-          if (value === 1) {
-            templateColumns[`.template-columns-full`] = {
-              "grid-template-columns": "100%",
-            }
-          }
-          else {
-            templateColumns[`.${ e(`template-columns-1/${ value }`) }`] = {
-              "grid-template-columns": `[start] repeat(${ value }, 1fr) [end]`,
-            }
+      if (gridCols !== false) {
+        for (const value of gridCols) {
+          templateCols[`.${ e(`grid-cols-${ value }`) }`] = {
+            "grid-template-columns": `[start] repeat(${ value }, minmax(0, 1fr)) [end]`,
           }
         }
       }
 
-      return { ...templateRows, ...templateColumns }
+      return { ...templateRows, ...templateCols }
     })()
 
     // grid-auto-*
-    const autoRowsColumns = (() => {
+    const autoRowsCols = (() => {
       const autoRows = {}
-      const autoColumns = {}
+      const autoCols = {}
 
       // grid-auto-rows
       if (gridRows !== false) {
         for (const value of gridRows) {
-          if (value === 1) {
-            autoRows[`.auto-rows-full`] = {
-              "grid-auto-rows": "100%",
-            }
-          }
-          else {
-            autoRows[`.${ e(`auto-rows-1/${ value }`) }`] = {
-              "grid-auto-rows": `calc(100% / ${ value })`,
-            }
+          autoRows[`.${ e(`auto-rows-${ value }`) }`] = {
+            "grid-auto-rows": `calc(100% / ${ value })`,
           }
         }
       }
 
       // grid-auto-columns
-      if (gridColumns !== false) {
-        for (const value of gridColumns) {
-          if (value === 1) {
-            autoColumns[`.auto-columns-full`] = {
-              "grid-auto-columns": "100%",
-            }
-          }
-          else {
-            autoColumns[`.${ e(`auto-columns-1/${ value }`) }`] = {
-              "grid-auto-columns": `calc(100% / ${ value })`,
-            }
+      if (gridCols !== false) {
+        for (const value of gridCols) {
+          autoCols[`.${ e(`auto-cols-${ value }`) }`] = {
+            "grid-auto-columns": `calc(100% / ${ value })`,
           }
         }
       }
 
-      return { ...autoRows, ...autoColumns }
+      return { ...autoRows, ...autoCols }
     })()
 
     // grid-row-* | grid-column-*
     const gridStartEnd = (() => {
+      // grid-row
+      const row = (gridRows !== false)
+        ? {
+          ".row-auto": {
+            "grid-row": "auto",
+          },
+        }
+        : {}
+
       // grid-row-start
       const rowStart = (gridRows !== false)
         ? {
@@ -319,19 +277,28 @@ module.exports = function ({ gridRows = false, gridColumns = false, multplierRow
         }
         : {}
 
-      // grid-column-start
-      const columnStart = (gridColumns !== false)
+      // grid-column
+      const col = (gridCols !== false)
         ? {
-          ".column-start-auto": {
+          ".col-auto": {
+            "grid-column": "auto",
+          },
+        }
+        : {}
+
+      // grid-column-start
+      const colStart = (gridCols !== false)
+        ? {
+          ".col-start-auto": {
             "grid-column-start": "auto",
           },
         }
         : {}
 
       // grid-column-end
-      const columnEnd = (gridColumns !== false)
+      const colEnd = (gridCols !== false)
         ? {
-          ".column-end-auto": {
+          ".col-end-auto": {
             "grid-column-end": "auto",
           },
         }
@@ -340,7 +307,7 @@ module.exports = function ({ gridRows = false, gridColumns = false, multplierRow
       // Initialise grid-rows-* values
       const rowLines = (gridRows !== false)
         ? Array.from({
-          length: (gridRows[(gridRows.length - 1)] * multplierRows + 1),
+          length: (gridRows[(gridRows.length - 1)] * rowMultiples + 1),
         }, (_, i) => i + 1)
         : []
 
@@ -359,81 +326,83 @@ module.exports = function ({ gridRows = false, gridColumns = false, multplierRow
       }
 
       // Initialise grid-columns-* values
-      const columnLines = (gridColumns !== false)
+      const colLines = (gridCols !== false)
         ? Array.from({
-          length: (gridColumns[(gridColumns.length - 1)] * multplierColumns + 1),
+          length: (gridCols[(gridCols.length - 1)] * colMultiples + 1),
         }, (_, i) => i + 1)
         : []
 
-      if (gridColumns !== false) {
-        for (const value of columnLines) {
+      if (gridCols !== false) {
+        for (const value of colLines) {
           // grid-column-start
-          columnStart[`.column-start-${ value }`] = {
+          colStart[`.col-start-${ value }`] = {
             "grid-column-start": `${ value }`,
           }
 
           // grid-column-end
-          columnEnd[`.column-end-${ (value + 1) }`] = {
+          colEnd[`.col-end-${ (value + 1) }`] = {
             "grid-column-end": `${ (value + 1) }`,
           }
         }
       }
 
-      return { ...rowStart, ...rowEnd, ...columnStart, ...columnEnd }
+      return { ...row, ...rowStart, ...rowEnd, ...col, ...colStart, ...colEnd }
     })()
 
-    // *-gap
-    const gapRowColumn = (() => {
+    // gap | *-gap
+    const gapRowCol = (() => {
+      const gap = {}
       const rowGap = {}
-      const columnGap = {}
+      const colGap = {}
 
-      // row-gap (px)
-      if (gapRows !== false) {
-        for (const value of gapRows) {
+      if (gaps !== false) {
+        // gap | *-gap (px)
+        for (const value of gaps) {
+          // gap
+          gap[`.gap-${ value }px`] = {
+            gap: `${ value }px`,
+          }
+
+          // row-gap
           rowGap[`.row-gap-${ value }px`] = {
             "row-gap": `${ value }px`,
           }
-        }
-      }
 
-      // column-gap (px)
-      if (gapColumns !== false) {
-        for (const value of gapColumns) {
-          columnGap[`.column-gap-${ value }px`] = {
+          // column-gap
+          colGap[`.col-gap-${ value }px`] = {
             "column-gap": `${ value }px`,
           }
         }
-      }
 
-      // *-gap (theme("spacing"))
-      for (const [ key, value ] of Object.entries(theme("spacing"))) {
-        if (key !== "px") {
+        // gap | *-gap (theme("spacing"))
+        for (const [ key, value ] of Object.entries(theme("spacing"))) {
+          // gap
+          gap[`.gap-${ key }`] = {
+            gap: `${ value } ${ value }`,
+          }
+
           // row-gap
-          if (gapRows !== false) {
-            rowGap[`.row-gap-${ key }`] = {
-              "row-gap": value,
-            }
+          rowGap[`.row-gap-${ key }`] = {
+            "row-gap": value,
           }
 
           // column-gap
-          if (gapColumns !== false) {
-            columnGap[`.column-gap-${ key }`] = {
-              "column-gap": value,
-            }
+          colGap[`.col-gap-${ key }`] = {
+            "column-gap": value,
           }
         }
       }
 
-      return { ...rowGap, ...columnGap }
+      return { ...gap, ...rowGap, ...colGap }
     })()
 
     addUtilities({
       ...grid,
       ...autoFlow,
-      ...templateRowsColumns,
-      ...autoRowsColumns,
+      ...templateRowsCols,
+      ...autoRowsCols,
       ...gridStartEnd,
-      ...gapRowColumn,
+      ...gapRowCol,
     }, [ "responsive" ])
   }
 }
