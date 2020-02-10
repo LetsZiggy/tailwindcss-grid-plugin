@@ -16,27 +16,23 @@
  *   Used to generate "grid-template-rows", and "grid-auto-rows"
  *   Used to generate "grid-row-start", and "grid-row-end"
  *   "grid-auto-rows" formula: `calc(100% / ${ gridRows.value })`
- *   Largest "grid-row-start" will be generated using the largest `${ gridRows.value * multiplierRows }`
- *   Largest "grid-row-end" will be generated using the largest `${ gridRows.value * multplierRows + 1 }`
+ *   Largest "grid-row-start" will be generated using the largest `${ gridRows.value * rowMultiples }`
+ *   Largest "grid-row-end" will be generated using the largest `${ gridRows.value * rowMultiples + 1 }`
  *
- * @param {Number[]} [options.gridColumns=[1,2,3,4,5,6,7,8,9,10,11,12]] - Only (gridColumns.value > 0) will be used
+ * @param {Number[]} [options.gridCols=[1,2,3,4,5,6,7,8,9,10,11,12]] - Only (gridCols.value > 0) will be used
  *   Used to generate "grid-template-columns", and "grid-auto-columns"
  *   Used to generate "grid-column-start", and "grid-column-end"
- *   "grid-auto-columns" formula: `calc(100% / ${ gridColumns.value })`
- *   Largest "grid-column-start" will be generated using the largest `${ gridColumns.value * multiplierColumns }`
- *   Largest "grid-column-end" will be generated using the largest `${ gridColumns.value * multplierColumns + 1 }`
+ *   "grid-auto-columns" formula: `calc(100% / ${ gridCols.value })`
+ *   Largest "grid-column-start" will be generated using the largest `${ gridCols.value * colMultiples }`
+ *   Largest "grid-column-end" will be generated using the largest `${ gridCols.value * colMultiples + 1 }`
  *
- * @param {Number} [options.multplierRows=5] - Multiplier to determine largest "grid-row-start", and "grid-row-end"
+ * @param {Number} [options.rowMultiples=5] - Multiplier to determine largest "grid-row-start", and "grid-row-end"
  *
- * @param {Number} [options.multplierColumns=1] - Multiplier to determine largest "grid-column-start", and "grid-column-end"
+ * @param {Number} [options.colMultiples=1] - Multiplier to determine largest "grid-column-start", and "grid-column-end"
  *
- * @param {Number[]} [options.gapRows=[1,2,3,4,5,6,7,8]] - Only (values > 0) will be used
- *   Used to generate "row-gap"
- *   Values provided will be used to generate gaps in "px" unit
- *   Values with "rem" units will also be generated based on theme("spacing")
- *
- * @param {Number[]} [options.gapColumns=[1,2,3,4,5,6,7,8]] - Only (values > 0) will be used
- *   Used to generate "column-gap"
+ * @param {Number[]} [options.gaps=[1,2,3,4,5,6,7,8]] - Only (values > 0) will be used
+ *   Used to generate "gap"
+ *   Used to generate "row-gap", and "column-gap"
  *   Values provided will be used to generate gaps in "px" unit
  *   Values with "rem" units will also be generated based on theme("spacing")
  *
@@ -44,7 +40,7 @@
  *
  * @return {Object} Returns Tailwindcss plugin
  */
-module.exports = function ({ gridRows = [], gridColumns = [], multplierRows = 5, multplierColumns = 1, gapRows = [], gapColumns = []} = {}) {
+module.exports = function ({ gridRows = [], gridCols = [], rowMultiples = 5, colMultiples = 1, gaps = []} = {}) {
   if (!Array.isArray(gridRows) || !gridRows.length) {
     gridRows = Array.from({
       length: 12,
@@ -62,13 +58,13 @@ module.exports = function ({ gridRows = [], gridColumns = [], multplierRows = 5,
     gridRows.sort((a, b) => a - b)
   }
 
-  if (!Array.isArray(gridColumns) || !gridColumns.length) {
-    gridColumns = Array.from({
+  if (!Array.isArray(gridCols) || !gridCols.length) {
+    gridCols = Array.from({
       length: 12,
     }, (_, i) => i + 1)
   }
-  else if (gridColumns.length > 1) {
-    gridColumns = gridColumns.reduce((acc, value) => {
+  else if (gridCols.length > 1) {
+    gridCols = gridCols.reduce((acc, value) => {
       if (Number.isInteger(value)) {
         acc.push(value)
       }
@@ -76,24 +72,24 @@ module.exports = function ({ gridRows = [], gridColumns = [], multplierRows = 5,
       return acc
     }, [])
 
-    gridColumns.sort((a, b) => a - b)
+    gridCols.sort((a, b) => a - b)
   }
 
-  if (!Number.isInteger(multplierRows)) {
-    multplierRows = 5
+  if (!Number.isInteger(rowMultiples)) {
+    rowMultiples = 5
   }
 
-  if (!Number.isInteger(multplierColumns)) {
-    multplierColumns = 1
+  if (!Number.isInteger(colMultiples)) {
+    colMultiples = 1
   }
 
-  if (!Array.isArray(gapRows) || !gapRows.length) {
-    gapRows = Array.from({
+  if (!Array.isArray(gaps) || !gaps.length) {
+    gaps = Array.from({
       length: 8,
     }, (_, i) => i + 1)
   }
-  else if (gapRows.length > 1) {
-    gapRows = gapRows.reduce((acc, value) => {
+  else if (gaps.length > 1) {
+    gaps = gaps.reduce((acc, value) => {
       if (Number.isInteger(value)) {
         acc.push(value)
       }
@@ -101,24 +97,7 @@ module.exports = function ({ gridRows = [], gridColumns = [], multplierRows = 5,
       return acc
     }, [])
 
-    gapRows.sort((a, b) => a - b)
-  }
-
-  if (!Array.isArray(gapColumns) || !gapColumns.length) {
-    gapColumns = Array.from({
-      length: 8,
-    }, (_, i) => i + 1)
-  }
-  else if (gapColumns.length > 1) {
-    gapColumns = gapColumns.reduce((acc, value) => {
-      if (Number.isInteger(value)) {
-        acc.push(value)
-      }
-
-      return acc
-    }, [])
-
-    gapColumns.sort((a, b) => a - b)
+    gaps.sort((a, b) => a - b)
   }
 
   return function ({ addUtilities, e, theme }) {
@@ -131,68 +110,68 @@ module.exports = function ({ gridRows = [], gridColumns = [], multplierRows = 5,
       },
     }
 
-    const templateRowsColumns = (() => {
-      const templateRows = {}
-      const templateColumns = {}
+    const templateRowsCols = (() => {
+      const templateRows = {
+        ".grid-rows-none": {
+          "grid-template-rows": "none",
+        },
+      }
+
+      const templateCols = {
+        ".grid-cols-none": {
+          "grid-template-columns": "none",
+        },
+      }
 
       for (const value of gridRows) {
-        if (value === 1) {
-          templateRows[`.template-rows-full`] = {
-            "grid-template-rows": "100%",
-          }
-        }
-        else {
-          templateRows[`.${ e(`template-rows-1/${ value }`) }`] = {
-            "grid-template-rows": `[start] repeat(${ value }, 1fr) [end]`,
-          }
+        templateRows[`.${ e(`grid-rows-${ value }`) }`] = {
+          "grid-template-rows": `[start] repeat(${ value }, minmax(0, 1fr)) [end]`,
         }
       }
 
-      for (const value of gridColumns) {
-        if (value === 1) {
-          templateColumns[`.template-columns-full`] = {
-            "grid-template-columns": "100%",
-          }
-        }
-        else {
-          templateColumns[`.${ e(`template-columns-1/${ value }`) }`] = {
-            "grid-template-columns": `[start] repeat(${ value }, 1fr) [end]`,
-          }
+      for (const value of gridCols) {
+        templateCols[`.${ e(`grid-cols-${ value }`) }`] = {
+          "grid-template-columns": `[start] repeat(${ value }, minmax(0, 1fr)) [end]`,
         }
       }
 
-      return { ...templateRows, ...templateColumns }
+      return { ...templateRows, ...templateCols }
     })()
 
-    const gapRowColumn = (() => {
+    const gapRowCol = (() => {
+      const gap = {}
       const rowGap = {}
-      const columnGap = {}
+      const colGap = {}
 
-      for (const value of gapRows) {
+      for (const value of gaps) {
+        gap[`.gap-${ value }px`] = {
+          gap: `${ value }px`,
+        }
+
         rowGap[`.row-gap-${ value }px`] = {
           "row-gap": `${ value }px`,
         }
-      }
 
-      for (const value of gapColumns) {
-        columnGap[`.column-gap-${ value }px`] = {
+        colGap[`.col-gap-${ value }px`] = {
           "column-gap": `${ value }px`,
         }
       }
 
       for (const [ key, value ] of Object.entries(theme("spacing"))) {
-        if (key !== "px") {
-          rowGap[`.row-gap-${ key }`] = {
-            "row-gap": value,
-          }
+        gap[`.gap-${ key }`] = {
+          gap: `${ value } ${ value }`,
+        }
 
-          columnGap[`.column-gap-${ key }`] = {
-            "column-gap": value,
-          }
+        rowGap[`.row-gap-${ key }`] = {
+          "row-gap": value,
+        }
+
+        colGap[`.col-gap-${ key }`] = {
+          "column-gap": value,
         }
       }
 
-      return { ...rowGap, ...columnGap }
+      return { ...gap, ...rowGap, ...colGap }
     })()
 
     const itemsJustifyAlign = (() => {
@@ -235,55 +214,47 @@ module.exports = function ({ gridRows = [], gridColumns = [], multplierRows = 5,
       return { ...justifyContent, ...alignContent }
     })()
 
-    const autoRowsColumns = (() => {
+    const autoRowsCols = (() => {
       const autoRows = {}
-      const autoColumns = {}
+      const autoCols = {}
 
       for (const value of gridRows) {
-        if (value === 1) {
-          autoRows[`.auto-rows-full`] = {
-            "grid-auto-rows": "100%",
-          }
-        }
-        else {
-          autoRows[`.${ e(`auto-rows-1/${ value }`) }`] = {
-            "grid-auto-rows": `calc(100% / ${ value })`,
-          }
+        autoRows[`.${ e(`auto-rows-${ value }`) }`] = {
+          "grid-auto-rows": `calc(100% / ${ value })`,
         }
       }
 
-      for (const value of gridColumns) {
-        if (value === 1) {
-          autoColumns[`.auto-columns-full`] = {
-            "grid-auto-columns": "100%",
-          }
-        }
-        else {
-          autoColumns[`.${ e(`auto-columns-1/${ value }`) }`] = {
-            "grid-auto-columns": `calc(100% / ${ value })`,
-          }
+      for (const value of gridCols) {
+        autoCols[`.${ e(`auto-cols-${ value }`) }`] = {
+          "grid-auto-columns": `calc(100% / ${ value })`,
         }
       }
 
-      return { ...autoRows, ...autoColumns }
+      return { ...autoRows, ...autoCols }
     })()
 
     const autoFlow = {
-      ".auto-flow-row": {
+      ".grid-flow-row": {
         "grid-auto-flow": "row",
       },
-      ".auto-flow-row-dense": {
+      ".grid-flow-row-dense": {
         "grid-auto-flow": "row dense",
       },
-      ".auto-flow-column": {
+      ".grid-flow-col": {
         "grid-auto-flow": "column",
       },
-      ".auto-flow-column-dense": {
+      ".grid-flow-col-dense": {
         "grid-auto-flow": "column dense",
       },
     }
 
     const gridStartEnd = (() => {
+      const row = {
+        ".row-auto": {
+          "grid-row": "auto",
+        },
+      }
+
       const rowStart = {
         ".row-start-auto": {
           "grid-row-start": "auto",
@@ -296,24 +267,30 @@ module.exports = function ({ gridRows = [], gridColumns = [], multplierRows = 5,
         },
       }
 
-      const columnStart = {
-        ".column-start-auto": {
+      const col = {
+        ".col-auto": {
+          "grid-column": "auto",
+        },
+      }
+
+      const colStart = {
+        ".col-start-auto": {
           "grid-column-start": "auto",
         },
       }
 
-      const columnEnd = {
-        ".column-end-auto": {
+      const colEnd = {
+        ".col-end-auto": {
           "grid-column-end": "auto",
         },
       }
 
       const rowLines = Array.from({
-        length: (gridRows[(gridRows.length - 1)] * multplierRows + 1),
+        length: (gridRows[(gridRows.length - 1)] * rowMultiples + 1),
       }, (_, i) => i + 1)
 
-      const columnLines = Array.from({
-        length: (gridColumns[(gridColumns.length - 1)] * multplierColumns + 1),
+      const colLines = Array.from({
+        length: (gridCols[(gridCols.length - 1)] * colMultiples + 1),
       }, (_, i) => i + 1)
 
       for (const value of rowLines) {
@@ -326,17 +303,17 @@ module.exports = function ({ gridRows = [], gridColumns = [], multplierRows = 5,
         }
       }
 
-      for (const value of columnLines) {
-        columnStart[`.column-start-${ value }`] = {
+      for (const value of colLines) {
+        colStart[`.col-start-${ value }`] = {
           "grid-column-start": `${ value }`,
         }
 
-        columnEnd[`.column-end-${ (value + 1) }`] = {
+        colEnd[`.col-end-${ (value + 1) }`] = {
           "grid-column-end": `${ (value + 1) }`,
         }
       }
 
-      return { ...rowStart, ...rowEnd, ...columnStart, ...columnEnd }
+      return { ...row, ...rowStart, ...rowEnd, ...col, ...colStart, ...colEnd }
     })()
 
     const selfJustifyAlign = (() => {
@@ -359,11 +336,11 @@ module.exports = function ({ gridRows = [], gridColumns = [], multplierRows = 5,
 
     addUtilities({
       ...grid,
-      ...templateRowsColumns,
-      ...gapRowColumn,
+      ...templateRowsCols,
+      ...gapRowCol,
       ...itemsJustifyAlign,
       ...contentJustifyAlign,
-      ...autoRowsColumns,
+      ...autoRowsCols,
       ...autoFlow,
       ...gridStartEnd,
       ...selfJustifyAlign,
