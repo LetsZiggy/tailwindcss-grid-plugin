@@ -1,0 +1,46 @@
+{
+  "folders":
+  [
+    {
+      "path": ".",
+      "name": "root",
+      "folder_exclude_patterns": [
+        ".svn",
+        ".git",
+        ".hg",
+        "CVS",
+        "node_modules",
+      ],
+      "follow_symlinks": true,
+    },
+  ],
+  "settings":
+  {
+    /*"default_encoding": "UTF-8",*/
+    /*"default_line_ending": "unix",*/
+    "detect_indentation": false,
+    /*"ensure_newline_at_eof_on_save": true,*/
+    "show_definitions": false,
+    "show_line_endings": true,
+    /*"tab_size": 2,*/
+    /*"translate_tabs_to_spaces": true,*/
+    /*"trim_trailing_white_space_on_save": true,*/
+    "use_tab_stops": true,
+    "word_wrap": true,
+
+    /* SublimeLinter-eslint */
+    "SublimeLinter.linters.eslint.disable": false,
+    "SublimeLinter.linters.eslint.working_dir": "${file_path}",
+    "SublimeLinter.linters.eslint.executable": "${folder}/node_modules/.bin/eslint_d",
+    "SublimeLinter.linters.eslint.lint_mode": "load_save",
+    "SublimeLinter.linters.eslint.disable_if_not_dependency": false,
+    "SublimeLinter.linters.eslint.selector": "source.js, source.ts - meta.attribute-with-value",
+    // "SublimeLinter.linters.eslint.working_dir": "",
+  },
+  "syntax_override":
+  {
+    "\\.json$": ["Babel", "JSON"],
+    "\\.js$": ["Babel", "JavaScript (Babel)"],
+    "\\.ts$": ["TypeScript", "TypeScript"],
+  }
+}
