@@ -364,12 +364,12 @@ module.exports = function ({ gridRows = false, gridCols = false, rowMultiples = 
           }
 
           // row-gap
-          rowGap[`.row-gap-${ value }px`] = {
+          rowGap[`.gap-y-${ value }px`] = {
             "row-gap": `${ value }px`,
           }
 
           // column-gap
-          colGap[`.col-gap-${ value }px`] = {
+          colGap[`.gap-x-${ value }px`] = {
             "column-gap": `${ value }px`,
           }
         }
@@ -382,12 +382,12 @@ module.exports = function ({ gridRows = false, gridCols = false, rowMultiples = 
           }
 
           // row-gap
-          rowGap[`.row-gap-${ key }`] = {
+          rowGap[`.gap-y-${ key }`] = {
             "row-gap": value,
           }
 
           // column-gap
-          colGap[`.col-gap-${ key }`] = {
+          colGap[`.gap-x-${ key }`] = {
             "column-gap": value,
           }
         }
